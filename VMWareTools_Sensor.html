@@ -1,0 +1,668 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VMware Tools Compliance Sensor - Dokumentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        
+        .header {
+            border-bottom: 3px solid #dc143c;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        
+        .header .meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        h2 {
+            color: #dc143c;
+            font-size: 1.6em;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #dc143c;
+        }
+        
+        h3 {
+            color: #dc143c;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .highlight-box {
+            background: #fff5f5;
+            border-left: 4px solid #dc143c;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        ul {
+            list-style: none;
+            margin: 15px 0;
+            padding-left: 0;
+        }
+        
+        ul li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 10px;
+        }
+        
+        ul li:before {
+            content: "■";
+            position: absolute;
+            left: 0;
+            color: #dc143c;
+            font-size: 1.2em;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        
+        table th {
+            background: #dc143c;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .success {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .warning {
+            color: #f39c12;
+            font-weight: 600;
+        }
+        
+        .error {
+            color: #dc143c;
+            font-weight: 600;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #dc143c;
+        }
+        
+        .feature-card h4 {
+            color: #dc143c;
+            margin-bottom: 10px;
+        }
+        
+        .status-legend {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .version-timeline {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .version-timeline h4 {
+            color: #dc143c;
+            margin-bottom: 15px;
+        }
+
+        .version-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .version-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>VMware Tools Compliance Sensor</h1>
+            <div class="meta">
+                <strong>Dokumentversion:</strong> 2.1 | 
+                <strong>Stand:</strong> 13. November 2025 | 
+                <strong>Projekt:</strong> Enterprise VMware Monitoring
+            </div>
+        </div>
+
+        <h2>Übersicht</h2>
+        <p>
+            Der VMware Tools Compliance Sensor ist eine PowerShell-basierte Monitoring-Lösung für Windows-Systeme,
+            die automatisch die installierte VMware Tools-Version erkennt und mit der aktuellen VMware-Baseline vergleicht.
+            Der Sensor ist speziell für PRTG optimiert, funktioniert aber auch als eigenständiges Tool.
+        </p>
+
+        <div class="highlight-box">
+            <strong>Wichtig:</strong> Der Sensor nutzt versionsnormalisierte Vergleiche und Exchange-spezifische Sicherheitsrichtlinien
+            für präzise Compliance-Prüfungen in Enterprise-Umgebungen. Baseline-Quelle ist die offizielle vTracker-API von VMware.
+        </div>
+
+        <h2>Aktuelle VMware Tools Baseline</h2>
+        <div class="version-timeline">
+            <h4>Offizielle Releases (Stand November 2025)</h4>
+            <table style="margin: 0; font-size: 0.9em;">
+                <thead>
+                    <tr>
+                        <th>Version</th>
+                        <th>Release-Datum</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background: #e8f5e9;">
+                        <td><strong>13.0.5.0</strong></td>
+                        <td>29. September 2025</td>
+                        <td><span class="success">✓ Aktuell</span></td>
+                    </tr>
+                    <tr>
+                        <td>12.5.4</td>
+                        <td>29. September 2025</td>
+                        <td>12.x-Branch</td>
+                    </tr>
+                    <tr>
+                        <td>13.0.1.0</td>
+                        <td>15. Juli 2025</td>
+                        <td>Vorgängerversion</td>
+                    </tr>
+                    <tr>
+                        <td>12.5.3</td>
+                        <td>15. Juli 2025</td>
+                        <td>12.x-Branch</td>
+                    </tr>
+                    <tr>
+                        <td>13.0.0.0</td>
+                        <td>17. Juni 2025</td>
+                        <td>Initial Release 13.x</td>
+                    </tr>
+                    <tr>
+                        <td>12.5.2</td>
+                        <td>12. Mai 2025</td>
+                        <td>12.x-Branch</td>
+                    </tr>
+                    <tr>
+                        <td>12.5.1</td>
+                        <td>25. März 2025</td>
+                        <td><span class="warning">⚠ Exchange-Minimum</span></td>
+                    </tr>
+                    <tr>
+                        <td>12.5.0</td>
+                        <td>08. Oktober 2024</td>
+                        <td><span class="warning">⚠ Allgemein-Minimum</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>Hauptfunktionen</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>Versionserkennung</h4>
+                <p>Automatische Erkennung über Registry und Executable mit WOW64-Umgehung</p>
+            </div>
+            <div class="feature-card">
+                <h4>Baseline-Abgleich</h4>
+                <p>Vergleich mit offiziellen VMware-Releases über vTracker API</p>
+            </div>
+            <div class="feature-card">
+                <h4>Versionsabstand</h4>
+                <p>Berechnung, wie viele Releases die Installation zurückliegt</p>
+            </div>
+            <div class="feature-card">
+                <h4>Exchange-Awareness</h4>
+                <p>Separate Sicherheitsrichtlinien für Exchange-Server (12.5.1+)</p>
+            </div>
+        </div>
+
+        <h2>Statuslogik</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Versionen zurück</th>
+                    <th>Status</th>
+                    <th>Bedeutung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0–1</td>
+                    <td class="success">✓ OK</td>
+                    <td>Aktuell oder maximal eine Version veraltet</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td class="warning">⚠ Warnung</td>
+                    <td>Zwei Versionen hinter aktueller Baseline</td>
+                </tr>
+                <tr>
+                    <td>3+</td>
+                    <td class="error">✗ Fehler</td>
+                    <td>Drei oder mehr Versionen veraltet</td>
+                </tr>
+                <tr>
+                    <td>Nicht gefunden</td>
+                    <td class="error">✗ Kritisch</td>
+                    <td>Unbekannte oder fehlende Version</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Sicherheitsrichtlinien</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Umgebung</th>
+                    <th>Mindestversion</th>
+                    <th>Hinweise</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Allgemein</td>
+                    <td>12.5.0</td>
+                    <td>Standard für alle Windows-VMs (Oktober 2024)</td>
+                </tr>
+                <tr>
+                    <td>Exchange-Server</td>
+                    <td>12.5.1</td>
+                    <td>Erhöhte Anforderungen (März 2025), automatische Erkennung</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Altersberechnung</h2>
+        <div class="highlight-box">
+            <p><strong>Wichtig:</strong> Das Alter bezieht sich auf die <strong>installierte Version</strong>, nicht auf die Baseline!</p>
+            <p style="margin-top: 10px;">
+                <code>Alter (Tage) = Heute - Release-Datum der lokalen Version</code>
+            </p>
+        </div>
+
+        <p><strong>Farbcodierung nach Monaten:</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Alter</th>
+                    <th>Farbe</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0–2 Monate</td>
+                    <td><span class="success">● Grün</span></td>
+                    <td>Aktuell</td>
+                </tr>
+                <tr>
+                    <td>3–4 Monate</td>
+                    <td><span class="warning">● Gelb</span></td>
+                    <td>Aufmerksamkeit erforderlich</td>
+                </tr>
+                <tr>
+                    <td>5–7 Monate</td>
+                    <td><span style="color: #000; background: #f39c12; padding: 2px 6px;">● Orange</span></td>
+                    <td>Veraltet</td>
+                </tr>
+                <tr>
+                    <td>8+ Monate</td>
+                    <td><span style="color: #fff; background: #c0392b; padding: 2px 6px;">● Rot</span></td>
+                    <td>Kritisch veraltet</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Versionserkennung</h2>
+        <p>Der Sensor nutzt vier Erkennungsmethoden in dieser Reihenfolge:</p>
+        <ul>
+            <li><strong>vmtoolsd.exe -v</strong> – Bevorzugt, zuverlässigste Methode</li>
+            <li><strong>64-Bit Registry</strong> – Umgeht WOW6432Node-Umleitung</li>
+            <li><strong>32-Bit Registry</strong> – Fallback für 32-Bit-Installationen</li>
+            <li><strong>Dateiversion</strong> – Letzter Fallback über FileVersionInfo</li>
+        </ul>
+
+        <h3>Versionsnormalisierung</h3>
+        <p>Versionen werden auf 3 Oktetten normalisiert für konsistenten Vergleich:</p>
+        <div class="code-block">
+12.5.0.51152 → 12.5.0
+13.0.5.0     → 13.0.5
+        </div>
+
+        <h2>Parameter</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Standard</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>-Mode</code></td>
+                    <td>auto</td>
+                    <td>Ausgabemodus: xml | legacy | text | json | ansi | auto</td>
+                </tr>
+                <tr>
+                    <td><code>-WarningThreshold</code></td>
+                    <td>2</td>
+                    <td>Anzahl Versionen zurück für Warnung</td>
+                </tr>
+                <tr>
+                    <td><code>-ErrorThreshold</code></td>
+                    <td>3</td>
+                    <td>Anzahl Versionen zurück für Fehler</td>
+                </tr>
+                <tr>
+                    <td><code>-TimeoutSec</code></td>
+                    <td>10</td>
+                    <td>Timeout für vTracker API-Anfragen</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Verwendung</h2>
+        
+        <h3>PRTG-Integration</h3>
+        <ul>
+            <li>Sensor-Typ: "EXE/Script Advanced"</li>
+            <li>Skript: <code>VMwareTools-ComplianceSensor.ps1</code></li>
+            <li>Parameter: <code>-Mode xml</code> (oder leer für Auto-Erkennung)</li>
+            <li>64-Bit PowerShell aktivieren (falls verfügbar)</li>
+            <li>Sicherheitskontext: "Windows-Anmeldedaten des übergeordneten Geräts"</li>
+        </ul>
+
+        <h3>Manuelle Ausführung</h3>
+        <div class="code-block">
+# Standard (automatische Modus-Erkennung)
+.\VMwareTools-ComplianceSensor.ps1
+
+# Farbige Ausgabe erzwingen
+.\VMwareTools-ComplianceSensor.ps1 -Mode ansi
+
+# JSON für Automatisierung
+.\VMwareTools-ComplianceSensor.ps1 -Mode json
+
+# Benutzerdefinierte Schwellwerte
+.\VMwareTools-ComplianceSensor.ps1 -WarningThreshold 3 -ErrorThreshold 5
+
+# Mit ausführlicher Diagnose
+.\VMwareTools-ComplianceSensor.ps1 -Verbose
+        </div>
+
+        <h2>Ausgabeformate</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Modus</th>
+                    <th>Verwendung</th>
+                    <th>Ausgabe</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>xml</td>
+                    <td>PRTG-Sensor</td>
+                    <td>PRTG XML-Format mit Channels und Limits</td>
+                </tr>
+                <tr>
+                    <td>legacy</td>
+                    <td>Legacy-Systeme</td>
+                    <td>Einzeilen-Format (kompatibel mit alten Sensoren)</td>
+                </tr>
+                <tr>
+                    <td>text</td>
+                    <td>Automatisierung</td>
+                    <td>Mehrzeiliger Textbericht</td>
+                </tr>
+                <tr>
+                    <td>json</td>
+                    <td>API/Integration</td>
+                    <td>JSON-Struktur für Weiterverarbeitung</td>
+                </tr>
+                <tr>
+                    <td>ansi</td>
+                    <td>Interaktive Shell</td>
+                    <td>Farbige Tabelle mit Legende</td>
+                </tr>
+                <tr>
+                    <td>auto</td>
+                    <td>Standard</td>
+                    <td>Kontextabhängige Auswahl (PRTG→xml, Shell→ansi)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Fehlerbehandlung</h2>
+        
+        <h3>VMware Tools nicht gefunden</h3>
+        <p><strong>Mögliche Ursachen:</strong></p>
+        <ul>
+            <li>32-Bit PowerShell trifft auf Registry-Umleitung</li>
+            <li>Fehlende Berechtigungen (UAC, Sensor-Konto)</li>
+            <li>Open VM Tools (Linux-Style) statt VMware Tools</li>
+            <li>Tatsächlich nicht installiert</li>
+        </ul>
+        <p><strong>Lösung:</strong></p>
+        <ul>
+            <li>PRTG: 64-Bit PowerShell in Sensor-Einstellungen aktivieren</li>
+            <li>Manuell: Als Administrator ausführen</li>
+            <li>Registry prüfen: <code>Get-ItemProperty 'HKLM:\SOFTWARE\VMware, Inc.\VMware Tools'</code></li>
+        </ul>
+
+        <h3>vTracker API nicht erreichbar</h3>
+        <div class="highlight-box">
+            Der Sensor nutzt automatisch einen Fallback-Baseline-Wert:<br>
+            <strong>VMware Tools 13.0.5.0 (29. September 2025)</strong>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                In hochsicheren Umgebungen kann der Internetzugang blockiert sein. 
+                Erwägen Sie Proxy-Konfiguration oder interne Baseline-Quelle.
+            </p>
+        </div>
+
+        <h2>Best Practices</h2>
+        
+        <h3>PRTG-Administratoren</h3>
+        <ul>
+            <li>Sensor-Hierarchie: Root → VMware → Gruppe: VMs (dieser Sensor)</li>
+            <li>Schwellwerte nach Umgebung: Dev/Test (3/5), Produktion (2/3), Kritisch (1/2)</li>
+            <li>Benachrichtigungen: State 1 = E-Mail, State 2 = Ticket, State 3 = Eskalation</li>
+            <li>Scan-Intervall: 4 Stunden (Compliance), 1 Stunde (kritische Systeme)</li>
+        </ul>
+
+        <h3>Systemadministratoren</h3>
+        <div class="code-block">
+# Massenprüfung über Remote-Sessions
+$servers = Get-Content .\servers.txt
+$results = $servers | ForEach-Object {
+    Invoke-Command -ComputerName $_ `
+        -FilePath .\VMwareTools-ComplianceSensor.ps1 `
+        -ArgumentList @('-Mode', 'json')
+} | ConvertFrom-Json
+
+# Nur kritische Systeme anzeigen (State ≥ 2)
+$results | Where-Object State -ge 2 | 
+    Format-Table PSComputerName, LocalVersion, VersionsBehind, Message
+
+# Export für Reporting
+$results | Export-Csv -Path .\VMwareTools-Report.csv -NoTypeInformation
+        </div>
+
+        <h2>Status-Legende</h2>
+        <div class="status-legend">
+            <div class="status-item">
+                <span class="status-dot" style="background: #27ae60;"></span>
+                <span><strong>OK (0):</strong> Aktuell oder 1 Version zurück</span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot" style="background: #f39c12;"></span>
+                <span><strong>Warnung (1):</strong> 2 Versionen zurück</span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot" style="background: #e74c3c;"></span>
+                <span><strong>Fehler (2):</strong> 3+ Versionen zurück</span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot" style="background: #c0392b;"></span>
+                <span><strong>Kritisch (3):</strong> Policy-Fail/Unbekannt</span>
+            </div>
+        </div>
+
+        <h2>Vorteile auf einen Blick</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Aspekt</th>
+                    <th>Vorteil</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Transparenz</td>
+                    <td>Echtzeit-Status mit Release-Datum und Versionsabstand</td>
+                </tr>
+                <tr>
+                    <td>Geschwindigkeit</td>
+                    <td>Statuscheck in Sekunden, keine komplexen Abfragen</td>
+                </tr>
+                <tr>
+                    <td>Audit-Sicherheit</td>
+                    <td>Vollständige Nachvollziehbarkeit mit Baseline-Quelle</td>
+                </tr>
+                <tr>
+                    <td>Keine Störung</td>
+                    <td>Kein Einfluss auf VMware-Infrastruktur oder Gast-OS</td>
+                </tr>
+                <tr>
+                    <td>Supportfreundlich</td>
+                    <td>Ein Befehl genügt für vollständigen Compliance-Status</td>
+                </tr>
+                <tr>
+                    <td>Offline-Fähig</td>
+                    <td>Fallback-Baseline bei API-Ausfall (13.0.5.0)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Zusammenfassung</h2>
+        <div class="highlight-box">
+            <p><strong>Diese Lösung stellt sicher:</strong></p>
+            <ul>
+                <li>Compliance-Status ist jederzeit überprüfbar (via vTracker API)</li>
+                <li>Automatische Exchange-Erkennung mit erhöhten Anforderungen (12.5.1+)</li>
+                <li>Altersberechnung basiert auf installierter Version (nicht Baseline)</li>
+                <li>Keine Auswirkung auf bestehende VMware-Infrastruktur</li>
+                <li>Production-ready für Enterprise-Umgebungen (PS 5.1+)</li>
+                <li>Fallback-Mechanismus bei API-Ausfall (13.0.5.0 vom 29.09.2025)</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p><strong>Entwickelt für:</strong> Enterprise VMware-Umgebungen mit PRTG</p>
+            <p><strong>Kompatibilität:</strong> PowerShell 5.1+, Windows Server 2012 R2+</p>
+            <p><strong>Getestet mit:</strong> VMware Tools 12.4.x - 13.0.x</p>
+            <p><strong>Baseline-Quelle:</strong> vTracker API (virten.net) mit Fallback 13.0.5.0</p>
+            <p style="margin-top: 20px;">
+                © 2025 Enterprise VMware Monitoring Team | Version 2.1 | Stand: 13. November 2025
+            </p>
+        </div>
+    </div>
+</body>
+</html>
