@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VMware Tools Compliance Sensor - Dokumentation</title>
+    <title>VMware Tools Compliance Sensor v4.0 - Dual-Branch Architecture</title>
     <style>
         * {
             margin: 0;
@@ -40,9 +40,21 @@
             margin-bottom: 10px;
         }
         
+        .header .version-badge {
+            display: inline-block;
+            background: #dc143c;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
         .header .meta {
             color: #7f8c8d;
             font-size: 0.9em;
+            margin-top: 10px;
         }
         
         h2 {
@@ -66,12 +78,23 @@
             text-align: justify;
         }
         
+        .separator {
+            height: 2px;
+            background: linear-gradient(to right, #dc143c, transparent);
+            margin: 30px 0;
+        }
+        
         .highlight-box {
             background: #fff5f5;
             border-left: 4px solid #dc143c;
             padding: 15px 20px;
             margin: 20px 0;
             border-radius: 4px;
+        }
+        
+        .highlight-box.new-feature {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
         }
         
         ul {
@@ -211,219 +234,245 @@
         .version-item:last-child {
             border-bottom: none;
         }
+
+        .branch-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .branch-badge.b13 {
+            background: #0ea5e9;
+            color: white;
+        }
+
+        .branch-badge.b12 {
+            background: #10b981;
+            color: white;
+        }
+
+        .branch-badge.eol {
+            background: #dc143c;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>VMware Tools Compliance Sensor</h1>
+            <span class="version-badge">v4.0 - Dual-Branch Architecture</span>
             <div class="meta">
-                <strong>Dokumentversion:</strong> 2.1 | 
+                <strong>Dokumentversion:</strong> 4.0 | 
                 <strong>Stand:</strong> 13. November 2025 | 
                 <strong>Projekt:</strong> Enterprise VMware Monitoring
             </div>
+        </div>
+
+        <div class="highlight-box new-feature">
+            <strong>🆕 Neu in Version 4.0:</strong> Vollständige Unterstützung für parallele VMware-Branch-Strategie (12.x und 13.x).
+            Der Sensor erkennt automatisch den installierten Branch und vergleicht nur innerhalb der gleichen Versionslinie.
         </div>
 
         <h2>Übersicht</h2>
         <p>
             Der VMware Tools Compliance Sensor ist eine PowerShell-basierte Monitoring-Lösung für Windows-Systeme,
             die automatisch die installierte VMware Tools-Version erkennt und mit der aktuellen VMware-Baseline vergleicht.
-            Der Sensor ist speziell für PRTG optimiert, funktioniert aber auch als eigenständiges Tool.
+            Ab Version 4.0 unterstützt der Sensor die <strong>parallele Wartung beider VMware-Branches</strong> (12.x und 13.x)
+            und berechnet den Versionsabstand <strong>branch-sensitiv</strong>.
         </p>
 
         <div class="highlight-box">
-            <strong>Wichtig:</strong> Der Sensor nutzt versionsnormalisierte Vergleiche und Exchange-spezifische Sicherheitsrichtlinien
+            <strong>Wichtig:</strong> Der Sensor nutzt branch-aware Version Filtering und Exchange-spezifische Sicherheitsrichtlinien
             für präzise Compliance-Prüfungen in Enterprise-Umgebungen. Baseline-Quelle ist die offizielle vTracker-API von VMware.
         </div>
 
-        <h2>Aktuelle VMware Tools Baseline</h2>
-        <div class="version-timeline">
-            <h4>Offizielle Releases (Stand November 2025)</h4>
-            <table style="margin: 0; font-size: 0.9em;">
-                <thead>
-                    <tr>
-                        <th>Version</th>
-                        <th>Release-Datum</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="background: #e8f5e9;">
-                        <td><strong>13.0.5.0</strong></td>
-                        <td>29. September 2025</td>
-                        <td><span class="success">✓ Aktuell</span></td>
-                    </tr>
-                    <tr>
-                        <td>12.5.4</td>
-                        <td>29. September 2025</td>
-                        <td>12.x-Branch</td>
-                    </tr>
-                    <tr>
-                        <td>13.0.1.0</td>
-                        <td>15. Juli 2025</td>
-                        <td>Vorgängerversion</td>
-                    </tr>
-                    <tr>
-                        <td>12.5.3</td>
-                        <td>15. Juli 2025</td>
-                        <td>12.x-Branch</td>
-                    </tr>
-                    <tr>
-                        <td>13.0.0.0</td>
-                        <td>17. Juni 2025</td>
-                        <td>Initial Release 13.x</td>
-                    </tr>
-                    <tr>
-                        <td>12.5.2</td>
-                        <td>12. Mai 2025</td>
-                        <td>12.x-Branch</td>
-                    </tr>
-                    <tr>
-                        <td>12.5.1</td>
-                        <td>25. März 2025</td>
-                        <td><span class="warning">⚠ Exchange-Minimum</span></td>
-                    </tr>
-                    <tr>
-                        <td>12.5.0</td>
-                        <td>08. Oktober 2024</td>
-                        <td><span class="warning">⚠ Allgemein-Minimum</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <div class="separator"></div>
 
-        <h2>Hauptfunktionen</h2>
+        <h2>VMware Branch-Strategie (2025)</h2>
+        <p>
+            VMware pflegt seit 2025 zwei parallele Tool-Branches für unterschiedliche ESXi-Versionen.
+            Diese Branches entwickeln sich <strong>unabhängig voneinander</strong> und haben separate Release-Zyklen:
+        </p>
+
         <div class="feature-grid">
             <div class="feature-card">
-                <h4>Versionserkennung</h4>
-                <p>Automatische Erkennung über Registry und Executable mit WOW64-Umgehung</p>
+                <h4><span class="branch-badge b13">13.x Branch</span></h4>
+                <ul>
+                    <li><strong>Ziel:</strong> ESXi 8.x und neuer</li>
+                    <li><strong>Status:</strong> Aktiv gewartet</li>
+                    <li><strong>Aktuell:</strong> 13.0.5 (29.09.2025)</li>
+                    <li><strong>Minimum:</strong> 13.0.0 (Soft), 13.0.5 (Hard)</li>
+                </ul>
             </div>
             <div class="feature-card">
-                <h4>Baseline-Abgleich</h4>
-                <p>Vergleich mit offiziellen VMware-Releases über vTracker API</p>
+                <h4><span class="branch-badge b12">12.x Branch</span></h4>
+                <ul>
+                    <li><strong>Ziel:</strong> ESXi 7.x und 6.x</li>
+                    <li><strong>Status:</strong> Aktiv gewartet</li>
+                    <li><strong>Aktuell:</strong> 12.5.4 (29.09.2025)</li>
+                    <li><strong>Minimum:</strong> 12.5.0 (Soft), 12.5.4 (Hard)</li>
+                </ul>
             </div>
             <div class="feature-card">
-                <h4>Versionsabstand</h4>
-                <p>Berechnung, wie viele Releases die Installation zurückliegt</p>
-            </div>
-            <div class="feature-card">
-                <h4>Exchange-Awareness</h4>
-                <p>Separate Sicherheitsrichtlinien für Exchange-Server (12.5.1+)</p>
+                <h4><span class="branch-badge eol">11.x und älter</span></h4>
+                <ul>
+                    <li><strong>Status:</strong> End-of-Life</li>
+                    <li><strong>Ergebnis:</strong> CRITICAL (3)</li>
+                    <li><strong>Empfehlung:</strong> Update auf 12.x oder 13.x erforderlich</li>
+                </ul>
             </div>
         </div>
 
-        <h2>Statuslogik</h2>
+        <h3>Branch-Aware Distance Calculation</h3>
+        <p>
+            Der Sensor v4.0 berechnet den Versionsabstand <strong>ausschließlich innerhalb des erkannten Branches</strong>:
+        </p>
+
         <table>
             <thead>
                 <tr>
-                    <th>Versionen zurück</th>
-                    <th>Status</th>
-                    <th>Bedeutung</th>
+                    <th>Installierte Version</th>
+                    <th>Vergleichsbasis (Branch-gefiltert)</th>
+                    <th>Versionsabstand</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>0–1</td>
-                    <td class="success">✓ OK</td>
-                    <td>Aktuell oder maximal eine Version veraltet</td>
+                    <td>12.5.3</td>
+                    <td>[12.5.4, 12.5.3, 12.5.2, 12.5.1, 12.5.0]</td>
+                    <td class="warning">1 Version zurück</td>
                 </tr>
                 <tr>
-                    <td>2</td>
-                    <td class="warning">⚠ Warnung</td>
-                    <td>Zwei Versionen hinter aktueller Baseline</td>
+                    <td>13.0.1</td>
+                    <td>[13.0.5, 13.0.1, 13.0.0]</td>
+                    <td class="warning">1 Version zurück</td>
                 </tr>
                 <tr>
-                    <td>3+</td>
-                    <td class="error">✗ Fehler</td>
-                    <td>Drei oder mehr Versionen veraltet</td>
+                    <td>12.5.4</td>
+                    <td>[12.5.4, 12.5.3, 12.5.2, ...]</td>
+                    <td class="success">0 Versionen zurück (OK)</td>
                 </tr>
                 <tr>
-                    <td>Nicht gefunden</td>
-                    <td class="error">✗ Kritisch</td>
-                    <td>Unbekannte oder fehlende Version</td>
+                    <td>11.3.5</td>
+                    <td>N/A (End-of-Life Branch)</td>
+                    <td class="error">CRITICAL → Update erforderlich</td>
                 </tr>
             </tbody>
         </table>
 
-        <h2>Sicherheitsrichtlinien</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Umgebung</th>
-                    <th>Mindestversion</th>
-                    <th>Hinweise</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Allgemein</td>
-                    <td>12.5.0</td>
-                    <td>Standard für alle Windows-VMs (Oktober 2024)</td>
-                </tr>
-                <tr>
-                    <td>Exchange-Server</td>
-                    <td>12.5.1</td>
-                    <td>Erhöhte Anforderungen (März 2025), automatische Erkennung</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <h2>Altersberechnung</h2>
         <div class="highlight-box">
-            <p><strong>Wichtig:</strong> Das Alter bezieht sich auf die <strong>installierte Version</strong>, nicht auf die Baseline!</p>
-            <p style="margin-top: 10px;">
-                <code>Alter (Tage) = Heute - Release-Datum der lokalen Version</code>
-            </p>
+            <strong>Wichtig:</strong> 12.5.3 wird NICHT mit 13.0.5 verglichen, da diese in unterschiedlichen Branches sind.
+            Jeder Branch hat seine eigene "Latest Version" und unabhängige Release-Nummerierung.
         </div>
 
-        <p><strong>Farbcodierung nach Monaten:</strong></p>
+        <div class="separator"></div>
+
+        <h2>Aktuelle VMware Tools Baseline</h2>
+        <div class="version-timeline">
+            <h4>Dual-Branch Baseline (Stand: Q4 2025)</h4>
+            <div class="version-item">
+                <span class="branch-badge b13">13.x</span>
+                <strong>VMware Tools 13.0.5.0</strong> – 29. September 2025
+            </div>
+            <div class="version-item">
+                <span class="branch-badge b12">12.x</span>
+                <strong>VMware Tools 12.5.4</strong> – 29. September 2025
+            </div>
+        </div>
+
+        <h3>Ältere Releases (Referenz)</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Alter</th>
-                    <th>Farbe</th>
+                    <th>Branch</th>
+                    <th>Version</th>
+                    <th>Release-Datum</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>0–2 Monate</td>
-                    <td><span class="success">● Grün</span></td>
-                    <td>Aktuell</td>
+                    <td><span class="branch-badge b13">13.x</span></td>
+                    <td>13.0.5.0</td>
+                    <td>29.09.2025</td>
+                    <td class="success">Latest</td>
                 </tr>
                 <tr>
-                    <td>3–4 Monate</td>
-                    <td><span class="warning">● Gelb</span></td>
-                    <td>Aufmerksamkeit erforderlich</td>
+                    <td><span class="branch-badge b12">12.x</span></td>
+                    <td>12.5.4</td>
+                    <td>29.09.2025</td>
+                    <td class="success">Latest</td>
                 </tr>
                 <tr>
-                    <td>5–7 Monate</td>
-                    <td><span style="color: #000; background: #f39c12; padding: 2px 6px;">● Orange</span></td>
-                    <td>Veraltet</td>
+                    <td><span class="branch-badge b13">13.x</span></td>
+                    <td>13.0.1.0</td>
+                    <td>15.07.2025</td>
+                    <td class="warning">Veraltet</td>
                 </tr>
                 <tr>
-                    <td>8+ Monate</td>
-                    <td><span style="color: #fff; background: #c0392b; padding: 2px 6px;">● Rot</span></td>
-                    <td>Kritisch veraltet</td>
+                    <td><span class="branch-badge b12">12.x</span></td>
+                    <td>12.5.3</td>
+                    <td>15.07.2025</td>
+                    <td class="warning">Veraltet</td>
+                </tr>
+                <tr>
+                    <td><span class="branch-badge b13">13.x</span></td>
+                    <td>13.0.0</td>
+                    <td>17.06.2025</td>
+                    <td class="warning">Veraltet</td>
+                </tr>
+                <tr>
+                    <td><span class="branch-badge eol">EOL</span></td>
+                    <td>11.3.5</td>
+                    <td>23.09.2021</td>
+                    <td class="error">End-of-Life</td>
                 </tr>
             </tbody>
         </table>
 
-        <h2>Versionserkennung</h2>
-        <p>Der Sensor nutzt vier Erkennungsmethoden in dieser Reihenfolge:</p>
-        <ul>
-            <li><strong>vmtoolsd.exe -v</strong> – Bevorzugt, zuverlässigste Methode</li>
-            <li><strong>64-Bit Registry</strong> – Umgeht WOW6432Node-Umleitung</li>
-            <li><strong>32-Bit Registry</strong> – Fallback für 32-Bit-Installationen</li>
-            <li><strong>Dateiversion</strong> – Letzter Fallback über FileVersionInfo</li>
-        </ul>
+        <div class="separator"></div>
 
-        <h3>Versionsnormalisierung</h3>
-        <p>Versionen werden auf 3 Oktetten normalisiert für konsistenten Vergleich:</p>
-        <div class="code-block">
-12.5.0.51152 → 12.5.0
-13.0.5.0     → 13.0.5
+        <h2>Kernfunktionen</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>Branch Detection</h4>
+                <p>Automatische Erkennung des installierten Major-Branch (12.x vs. 13.x) und Filterung der Baseline auf die passende Versionslinie.</p>
+            </div>
+            <div class="feature-card">
+                <h4>Dual-Branch Policy</h4>
+                <p>Separate Mindestanforderungen für jeden Branch mit optionaler <code>-StrictBranchPolicy</code> für ESXi 8.x Umgebungen.</p>
+            </div>
+            <div class="feature-card">
+                <h4>EOL Detection</h4>
+                <p>Automatische Erkennung von End-of-Life Branches (11.x und älter) mit CRITICAL-Status und Update-Empfehlung.</p>
+            </div>
+            <div class="feature-card">
+                <h4>Exchange-Aware</h4>
+                <p>Automatische Exchange-Erkennung mit branch-spezifischen erhöhten Sicherheitsanforderungen (12.5.4+ bzw. 13.0.5+).</p>
+            </div>
+            <div class="feature-card">
+                <h4>Versionsnormalisierung</h4>
+                <p>3-Octet-Normalisierung (Major.Minor.Patch) für präzise Vergleiche innerhalb des Branches.</p>
+            </div>
+            <div class="feature-card">
+                <h4>Altersberechnung</h4>
+                <p>Release-Datum der installierten Version (nicht der Baseline) für präzise Compliance-Berichte.</p>
+            </div>
+            <div class="feature-card">
+                <h4>vTracker Integration</h4>
+                <p>Automatischer Abruf der aktuellen Baseline via vTracker-API mit Fallback auf beide Branch-Baselines.</p>
+            </div>
+            <div class="feature-card">
+                <h4>Multi-Format Output</h4>
+                <p>PRTG XML, JSON, Text, Legacy und farbige ANSI-Ausgabe mit Branch-Visualisierung.</p>
+            </div>
         </div>
+
+        <div class="separator"></div>
 
         <h2>Parameter</h2>
         <table>
@@ -443,49 +492,171 @@
                 <tr>
                     <td><code>-WarningThreshold</code></td>
                     <td>2</td>
-                    <td>Anzahl Versionen zurück für Warnung</td>
+                    <td>Anzahl Versionen zurück für Warnung (innerhalb Branch)</td>
                 </tr>
                 <tr>
                     <td><code>-ErrorThreshold</code></td>
-                    <td>3</td>
-                    <td>Anzahl Versionen zurück für Fehler</td>
+                    <td>4</td>
+                    <td>Anzahl Versionen zurück für Fehler (innerhalb Branch)</td>
                 </tr>
                 <tr>
                     <td><code>-TimeoutSec</code></td>
                     <td>10</td>
                     <td>Timeout für vTracker API-Anfragen</td>
                 </tr>
+                <tr>
+                    <td><code>-StrictBranchPolicy</code></td>
+                    <td>$false</td>
+                    <td>Wenn aktiviert: 12.x Branch erzeugt Warnung (für ESXi 8.x)</td>
+                </tr>
             </tbody>
         </table>
+
+        <div class="separator"></div>
+
+        <h2>Status-Logik (Branch-Aware)</h2>
+        <p>Die Statusberechnung folgt einer klaren Priorität:</p>
+
+        <h3>1. EOL Detection (Höchste Priorität)</h3>
+        <div class="highlight-box">
+            <strong>Branch 11.x und älter → State: 3 (CRITICAL)</strong><br>
+            Empfehlung: Sofortiges Update auf 12.x (ESXi 7.x/6.x) oder 13.x (ESXi 8.x)
+        </div>
+
+        <h3>2. Policy Violation (Branch-spezifisch)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Branch</th>
+                    <th>Minimum (Soft)</th>
+                    <th>Minimum (Hard)</th>
+                    <th>Status bei Verletzung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="branch-badge b13">13.x</span></td>
+                    <td>13.0.0</td>
+                    <td>13.0.5</td>
+                    <td class="warning">Warning (1) / Error (2)</td>
+                </tr>
+                <tr>
+                    <td><span class="branch-badge b12">12.x</span></td>
+                    <td>12.5.0</td>
+                    <td>12.5.4</td>
+                    <td class="warning">Warning (1) / Error (2)</td>
+                </tr>
+                <tr>
+                    <td><span class="branch-badge b12">12.x</span></td>
+                    <td colspan="2">Mit <code>-StrictBranchPolicy</code></td>
+                    <td class="warning">Warning → "Upgrade to 13.x"</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>3. Distance-Based (Innerhalb Branch)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Versionsabstand</th>
+                    <th>Status</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0 Versionen zurück</td>
+                    <td class="success">OK (0)</td>
+                    <td>Latest Version im Branch installiert</td>
+                </tr>
+                <tr>
+                    <td>1 Version zurück</td>
+                    <td class="success">OK (0)</td>
+                    <td>Akzeptabler Versionsstand</td>
+                </tr>
+                <tr>
+                    <td>2-3 Versionen zurück</td>
+                    <td class="warning">Warning (1)</td>
+                    <td>Update im Branch empfohlen</td>
+                </tr>
+                <tr>
+                    <td>4+ Versionen zurück</td>
+                    <td class="error">Error (2)</td>
+                    <td>Update im Branch erforderlich</td>
+                </tr>
+                <tr>
+                    <td>Version nicht in Baseline</td>
+                    <td class="warning">Warning (1)</td>
+                    <td>Unbekannte Version oder Custom Build</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="separator"></div>
 
         <h2>Verwendung</h2>
         
         <h3>PRTG-Integration</h3>
         <ul>
             <li>Sensor-Typ: "EXE/Script Advanced"</li>
-            <li>Skript: <code>VMwareTools-ComplianceSensor.ps1</code></li>
+            <li>Skript: <code>VMwareTools-ComplianceSensor-DualBranch.ps1</code></li>
             <li>Parameter: <code>-Mode xml</code> (oder leer für Auto-Erkennung)</li>
+            <li>Optional: <code>-StrictBranchPolicy</code> für ESXi 8.x Umgebungen</li>
             <li>64-Bit PowerShell aktivieren (falls verfügbar)</li>
             <li>Sicherheitskontext: "Windows-Anmeldedaten des übergeordneten Geräts"</li>
         </ul>
 
         <h3>Manuelle Ausführung</h3>
         <div class="code-block">
-# Standard (automatische Modus-Erkennung)
-.\VMwareTools-ComplianceSensor.ps1
+# Standard (automatische Modus-Erkennung, branch-aware)
+.\VMwareTools-ComplianceSensor-DualBranch.ps1
 
-# Farbige Ausgabe erzwingen
-.\VMwareTools-ComplianceSensor.ps1 -Mode ansi
+# Farbige Ausgabe mit Branch-Visualisierung
+.\VMwareTools-ComplianceSensor-DualBranch.ps1 -Mode ansi
 
-# JSON für Automatisierung
-.\VMwareTools-ComplianceSensor.ps1 -Mode json
+# JSON für Automatisierung (mit Branch-Info)
+.\VMwareTools-ComplianceSensor-DualBranch.ps1 -Mode json
 
-# Benutzerdefinierte Schwellwerte
-.\VMwareTools-ComplianceSensor.ps1 -WarningThreshold 3 -ErrorThreshold 5
+# Strict Mode für ESXi 8.x (12.x Branch = Warning)
+.\VMwareTools-ComplianceSensor-DualBranch.ps1 -StrictBranchPolicy
 
-# Mit ausführlicher Diagnose
-.\VMwareTools-ComplianceSensor.ps1 -Verbose
+# Benutzerdefinierte Schwellwerte (innerhalb Branch)
+.\VMwareTools-ComplianceSensor-DualBranch.ps1 -WarningThreshold 3 -ErrorThreshold 5
+
+# Mit ausführlicher Diagnose (zeigt Branch-Filter)
+.\VMwareTools-ComplianceSensor-DualBranch.ps1 -Verbose
         </div>
+
+        <h3>Beispiel-Output (Branch-Aware)</h3>
+        <div class="code-block">
+╔══════════════════════════════════════════════════════════════╗
+║  VMware Tools Compliance (Dual-Branch: 12.x+13.x)           ║
+╚══════════════════════════════════════════════════════════════╝
+
+  Local Version        : 12.5.3
+  Local Branch         : 12.x
+  Local Release Date   : 2025-07-15
+  Baseline Version     : 12.5.4
+  Age (days)           : 76
+  Versions Behind      : 1
+  Branch Policy        : Dual-Branch (12.x + 13.x parallel)
+  Is End-of-Life       : No
+  Exchange Detected    : False
+  Min Safe Applied     : 12.5.4
+
+  Overall State        : 1 (Warning)
+
+  Status Message
+  Warning (1 version behind in 12.x branch: 12.5.3)
+
+  Recommendation
+  Update to latest 12.x release (12.5.4+)
+
+Legend:
+  Branch: 13.x (ESXi 8.x)  12.x (ESXi 7.x/6.x)  11.x- (EOL)
+        </div>
+
+        <div class="separator"></div>
 
         <h2>Ausgabeformate</h2>
         <table>
@@ -493,42 +664,44 @@
                 <tr>
                     <th>Modus</th>
                     <th>Verwendung</th>
-                    <th>Ausgabe</th>
+                    <th>Branch-Info</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>xml</td>
                     <td>PRTG-Sensor</td>
-                    <td>PRTG XML-Format mit Channels und Limits</td>
+                    <td>Branch als Text-Channel + IsEOL-Channel</td>
                 </tr>
                 <tr>
                     <td>legacy</td>
                     <td>Legacy-Systeme</td>
-                    <td>Einzeilen-Format (kompatibel mit alten Sensoren)</td>
+                    <td>Branch in einzeiliger Ausgabe inkludiert</td>
                 </tr>
                 <tr>
                     <td>text</td>
                     <td>Automatisierung</td>
-                    <td>Mehrzeiliger Textbericht</td>
+                    <td>Branch + Compatibility Matrix im Report</td>
                 </tr>
                 <tr>
                     <td>json</td>
                     <td>API/Integration</td>
-                    <td>JSON-Struktur für Weiterverarbeitung</td>
+                    <td>LocalBranch, IsEOL, BranchPolicy als Properties</td>
                 </tr>
                 <tr>
                     <td>ansi</td>
                     <td>Interaktive Shell</td>
-                    <td>Farbige Tabelle mit Legende</td>
+                    <td>Branch farbcodiert (13.x=Cyan, 12.x=Green, EOL=Red)</td>
                 </tr>
                 <tr>
                     <td>auto</td>
                     <td>Standard</td>
-                    <td>Kontextabhängige Auswahl (PRTG→xml, Shell→ansi)</td>
+                    <td>Kontextabhängig (PRTG→xml, Shell→ansi)</td>
                 </tr>
             </tbody>
         </table>
+
+        <div class="separator"></div>
 
         <h2>Fehlerbehandlung</h2>
         
@@ -549,61 +722,101 @@
 
         <h3>vTracker API nicht erreichbar</h3>
         <div class="highlight-box">
-            Der Sensor nutzt automatisch einen Fallback-Baseline-Wert:<br>
-            <strong>VMware Tools 13.0.5.0 (29. September 2025)</strong>
+            Der Sensor nutzt automatisch einen Dual-Branch-Fallback:<br>
+            <strong>13.x:</strong> VMware Tools 13.0.5.0 (29.09.2025)<br>
+            <strong>12.x:</strong> VMware Tools 12.5.4 (29.09.2025)
             <p style="margin-top: 10px; font-size: 0.9em;">
                 In hochsicheren Umgebungen kann der Internetzugang blockiert sein. 
                 Erwägen Sie Proxy-Konfiguration oder interne Baseline-Quelle.
             </p>
         </div>
 
+        <div class="separator"></div>
+
         <h2>Best Practices</h2>
         
         <h3>PRTG-Administratoren</h3>
         <ul>
             <li>Sensor-Hierarchie: Root → VMware → Gruppe: VMs (dieser Sensor)</li>
-            <li>Schwellwerte nach Umgebung: Dev/Test (3/5), Produktion (2/3), Kritisch (1/2)</li>
+            <li>Schwellwerte nach Umgebung: Dev/Test (3/5), Produktion (2/4), Kritisch (1/2)</li>
             <li>Benachrichtigungen: State 1 = E-Mail, State 2 = Ticket, State 3 = Eskalation</li>
             <li>Scan-Intervall: 4 Stunden (Compliance), 1 Stunde (kritische Systeme)</li>
+            <li>ESXi 8.x Umgebungen: <code>-StrictBranchPolicy</code> aktivieren</li>
         </ul>
 
-        <h3>Systemadministratoren</h3>
+        <h3>Branch-Migration Strategy</h3>
         <div class="code-block">
-# Massenprüfung über Remote-Sessions
-$servers = Get-Content .\servers.txt
+# Identifiziere alle VMs mit 12.x Branch auf ESXi 8.x Hosts
+$servers = Get-Content .\esxi8-vms.txt
 $results = $servers | ForEach-Object {
     Invoke-Command -ComputerName $_ `
-        -FilePath .\VMwareTools-ComplianceSensor.ps1 `
+        -FilePath .\VMwareTools-ComplianceSensor-DualBranch.ps1 `
         -ArgumentList @('-Mode', 'json')
 } | ConvertFrom-Json
 
-# Nur kritische Systeme anzeigen (State ≥ 2)
-$results | Where-Object State -ge 2 | 
-    Format-Table PSComputerName, LocalVersion, VersionsBehind, Message
+# Filter: 12.x Branch (Migration zu 13.x empfohlen)
+$migrationCandidates = $results | Where-Object { 
+    $_.LocalBranch -eq '12.x' -and -not $_.IsEOL 
+}
 
-# Export für Reporting
-$results | Export-Csv -Path .\VMwareTools-Report.csv -NoTypeInformation
+$migrationCandidates | 
+    Format-Table PSComputerName, LocalVersion, LocalBranch, AgeDays, Message
+
+# Export für Migrations-Planung
+$migrationCandidates | Select-Object PSComputerName, LocalVersion, 
+    LocalBranch, AgeDays, BranchRecommendation |
+    Export-Csv -Path .\VMwareTools-MigrationPlan.csv -NoTypeInformation
         </div>
+
+        <h3>Systemadministratoren</h3>
+        <div class="code-block">
+# Massenprüfung mit Branch-Analyse
+$servers = Get-Content .\servers.txt
+$results = $servers | ForEach-Object {
+    Invoke-Command -ComputerName $_ `
+        -FilePath .\VMwareTools-ComplianceSensor-DualBranch.ps1 `
+        -ArgumentList @('-Mode', 'json')
+} | ConvertFrom-Json
+
+# Statistik nach Branch
+$results | Group-Object LocalBranch | 
+    Select-Object Name, Count, 
+    @{N='AvgAgeDays';E={($_.Group.AgeDays | Measure-Object -Average).Average}}
+
+# Nur kritische Systeme (EOL oder State ≥ 2)
+$critical = $results | Where-Object { $_.IsEOL -or $_.State -ge 2 }
+$critical | Format-Table PSComputerName, LocalVersion, LocalBranch, 
+    @{N='Status';E={if($_.IsEOL){'EOL'}else{$_.Message}}}
+
+# Branch-Compliance Report
+$results | Select-Object PSComputerName, LocalVersion, LocalBranch, 
+    VersionsBehind, AgeDays, IsEOL, BranchRecommendation |
+    Export-Csv -Path .\VMwareTools-BranchReport.csv -NoTypeInformation
+        </div>
+
+        <div class="separator"></div>
 
         <h2>Status-Legende</h2>
         <div class="status-legend">
             <div class="status-item">
                 <span class="status-dot" style="background: #27ae60;"></span>
-                <span><strong>OK (0):</strong> Aktuell oder 1 Version zurück</span>
+                <span><strong>OK (0):</strong> Aktuell oder 1 Version zurück (innerhalb Branch)</span>
             </div>
             <div class="status-item">
                 <span class="status-dot" style="background: #f39c12;"></span>
-                <span><strong>Warnung (1):</strong> 2 Versionen zurück</span>
+                <span><strong>Warnung (1):</strong> 2-3 Versionen zurück (innerhalb Branch)</span>
             </div>
             <div class="status-item">
                 <span class="status-dot" style="background: #e74c3c;"></span>
-                <span><strong>Fehler (2):</strong> 3+ Versionen zurück</span>
+                <span><strong>Fehler (2):</strong> 4+ Versionen zurück (innerhalb Branch)</span>
             </div>
             <div class="status-item">
                 <span class="status-dot" style="background: #c0392b;"></span>
-                <span><strong>Kritisch (3):</strong> Policy-Fail/Unbekannt</span>
+                <span><strong>Kritisch (3):</strong> EOL-Branch / Policy-Fail / Nicht installiert</span>
             </div>
         </div>
+
+        <div class="separator"></div>
 
         <h2>Vorteile auf einen Blick</h2>
         <table>
@@ -615,16 +828,28 @@ $results | Export-Csv -Path .\VMwareTools-Report.csv -NoTypeInformation
             </thead>
             <tbody>
                 <tr>
+                    <td>Branch-Awareness</td>
+                    <td>Korrekte Distanz-Berechnung innerhalb 12.x oder 13.x Branch</td>
+                </tr>
+                <tr>
+                    <td>ESXi-Kompatibilität</td>
+                    <td>Automatische Erkennung und Empfehlung basierend auf Branch (8.x→13.x, 7.x/6.x→12.x)</td>
+                </tr>
+                <tr>
+                    <td>EOL-Schutz</td>
+                    <td>Automatische Warnung bei End-of-Life Branches (11.x und älter)</td>
+                </tr>
+                <tr>
                     <td>Transparenz</td>
-                    <td>Echtzeit-Status mit Release-Datum und Versionsabstand</td>
+                    <td>Echtzeit-Status mit Branch-Info, Release-Datum und Versionsabstand</td>
                 </tr>
                 <tr>
                     <td>Geschwindigkeit</td>
-                    <td>Statuscheck in Sekunden, keine komplexen Abfragen</td>
+                    <td>Statuscheck in Sekunden, keine komplexen Cross-Branch-Vergleiche</td>
                 </tr>
                 <tr>
                     <td>Audit-Sicherheit</td>
-                    <td>Vollständige Nachvollziehbarkeit mit Baseline-Quelle</td>
+                    <td>Vollständige Nachvollziehbarkeit mit Baseline-Quelle und Branch-Policy</td>
                 </tr>
                 <tr>
                     <td>Keine Störung</td>
@@ -632,35 +857,70 @@ $results | Export-Csv -Path .\VMwareTools-Report.csv -NoTypeInformation
                 </tr>
                 <tr>
                     <td>Supportfreundlich</td>
-                    <td>Ein Befehl genügt für vollständigen Compliance-Status</td>
+                    <td>Ein Befehl genügt für vollständigen Branch-aware Compliance-Status</td>
                 </tr>
                 <tr>
                     <td>Offline-Fähig</td>
-                    <td>Fallback-Baseline bei API-Ausfall (13.0.5.0)</td>
+                    <td>Dual-Branch Fallback bei API-Ausfall (13.0.5 + 12.5.4)</td>
                 </tr>
             </tbody>
         </table>
 
+        <div class="separator"></div>
+
+        <h2>Migration von v2.0 zu v4.0</h2>
+        <div class="highlight-box">
+            <strong>Wichtige Änderungen:</strong>
+            <ul>
+                <li><strong>Script-Name:</strong> <code>VMwareTools-ComplianceSensor-DualBranch.ps1</code></li>
+                <li><strong>Neue Parameter:</strong> <code>-StrictBranchPolicy</code> (optional)</li>
+                <li><strong>Neue Output-Properties:</strong> <code>LocalBranch</code>, <code>IsEOL</code>, <code>BranchPolicy</code>, <code>BranchRecommendation</code></li>
+                <li><strong>Geänderte Schwellwerte:</strong> <code>-ErrorThreshold</code> Standard: 3 → 4 (mehr Toleranz im Branch)</li>
+                <li><strong>Kompatibilität:</strong> Vollständig abwärtskompatibel (alle v2.0 Parameter funktionieren)</li>
+            </ul>
+        </div>
+
+        <h3>PRTG Sensor Update</h3>
+        <div class="code-block">
+# 1. Neues Script hochladen
+# PRTG Web UI → Setup → System Administration → Administrative Tools
+# → Custom Sensors → EXE/Script Advanced → Upload
+
+# 2. Sensor-Einstellungen anpassen (optional)
+# Sensor → Settings → Parameters:
+# Alt:  -Mode xml
+# Neu:  -Mode xml -StrictBranchPolicy  # (nur für ESXi 8.x)
+
+# 3. Sensor-Kanäle erweitern (automatisch nach erstem Scan)
+# Neue Kanäle: LocalBranch (Text), IsEOL (Numeric), BranchPolicy (Text)
+        </div>
+
+        <div class="separator"></div>
+
         <h2>Zusammenfassung</h2>
         <div class="highlight-box">
-            <p><strong>Diese Lösung stellt sicher:</strong></p>
+            <p><strong>Version 4.0 stellt sicher:</strong></p>
             <ul>
-                <li>Compliance-Status ist jederzeit überprüfbar (via vTracker API)</li>
-                <li>Automatische Exchange-Erkennung mit erhöhten Anforderungen (12.5.1+)</li>
+                <li>Branch-aware Distanz-Berechnung (12.x und 13.x getrennt)</li>
+                <li>Korrekte Compliance-Prüfung für parallele VMware-Branches</li>
+                <li>Automatische EOL-Erkennung (11.x und älter → CRITICAL)</li>
+                <li>ESXi-Kompatibilitäts-Matrix (8.x→13.x, 7.x/6.x→12.x)</li>
+                <li>Optional: Strict Mode für ESXi 8.x (12.x → WARNING)</li>
+                <li>Automatische Exchange-Erkennung mit branch-spezifischen Anforderungen</li>
                 <li>Altersberechnung basiert auf installierter Version (nicht Baseline)</li>
-                <li>Keine Auswirkung auf bestehende VMware-Infrastruktur</li>
+                <li>Dual-Branch Fallback bei API-Ausfall (13.0.5 + 12.5.4)</li>
                 <li>Production-ready für Enterprise-Umgebungen (PS 5.1+)</li>
-                <li>Fallback-Mechanismus bei API-Ausfall (13.0.5.0 vom 29.09.2025)</li>
+                <li>Keine Auswirkung auf bestehende VMware-Infrastruktur</li>
             </ul>
         </div>
 
         <div class="footer">
-            <p><strong>Entwickelt für:</strong> Enterprise VMware-Umgebungen mit PRTG</p>
+            <p><strong>Entwickelt für:</strong> Enterprise VMware-Umgebungen mit paralleler Branch-Strategie</p>
             <p><strong>Kompatibilität:</strong> PowerShell 5.1+, Windows Server 2012 R2+</p>
-            <p><strong>Getestet mit:</strong> VMware Tools 12.4.x - 13.0.x</p>
-            <p><strong>Baseline-Quelle:</strong> vTracker API (virten.net) mit Fallback 13.0.5.0</p>
+            <p><strong>Getestet mit:</strong> VMware Tools 12.5.x (ESXi 7.x/6.x) und 13.0.x (ESXi 8.x)</p>
+            <p><strong>Baseline-Quelle:</strong> vTracker API (virten.net) mit Dual-Branch Fallback</p>
             <p style="margin-top: 20px;">
-                © 2025 Enterprise VMware Monitoring Team | Version 2.1 | Stand: 13. November 2025
+                © 2025 Enterprise VMware Monitoring Team | <strong>Version 4.0 - Dual-Branch Architecture</strong> | Stand: 13. November 2025
             </p>
         </div>
     </div>
