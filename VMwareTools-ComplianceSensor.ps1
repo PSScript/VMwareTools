@@ -244,6 +244,8 @@ function Get-LocalToolsVersion {
 # VTRACKER BASELINE WITH FALLBACK
 # ============================================================================
 
+# Replace the Get-BaselineFromVTracker function with this:
+
 function Get-BaselineFromVTracker {
     $url = 'https://www.virten.net/repo/vTracker.json'
     Write-Verbose "Fetching baseline from vTracker: $url"
@@ -261,11 +263,11 @@ function Get-BaselineFromVTracker {
         Write-Verbose "vTracker API unavailable: $_"
     }
     
-    # Fallback baseline if API fails
-    Write-Warning "vTracker API not reachable - using static fallback baseline"
+    # UPDATED Fallback baseline - VMware Tools 13.0.5.0 from September 2025
+    Write-Warning "vTracker API not reachable - using static fallback baseline (VMware Tools 13.0.5.0)"
     return @([pscustomobject]@{
-        product = 'VMware Tools 13.0.5'
-        releaseDate = '2024-11-15'
+        product = 'VMware Tools 13.0.5.0'
+        releaseDate = '2025-09-29'
     })
 }
 
